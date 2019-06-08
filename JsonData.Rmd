@@ -1,0 +1,29 @@
+---
+title: "JsonData"
+author: "Sejin Lim"
+date: "June 8, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About JSON
+
+In computing, **JavaScript Object Notation (JSON)** is an open-standard file format that uses human-readable text to transmit data objects consisting of attribute–value pairs and array data types (or any other serializable value). It is a very common data format used for asynchronous browser–server communication, including as a replacement for XML in some AJAX-style systems. For more detail see <https://en.wikipedia.org/wiki/JSON>
+
+
+```{r graphics, out.width="400px",  Echo=FALSE}
+knitr::include_graphics("jsonWiki.png")
+```
+
+## Read JSON in R
+
+To read JSON data type, we need to install some pacakage such as `jsonlite`. 
+
+```{r pressure, echo=TRUE, warning=FALSE}
+library(jsonlite)
+data<-fromJSON("C:/Users/slim22/ProjectData.json")
+
+```
