@@ -1,8 +1,12 @@
 ---
-title: "JsonData"
+title: "JSONData"
 author: "Sejin Lim"
 date: "June 8, 2019"
-output: html_document
+output:   
+  html_document:  
+    toc: yes  
+    toc_float: yes  
+    
 ---
 
 ```{r setup, include=FALSE}
@@ -11,14 +15,32 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## About JSON
 
+
 In computing, **JavaScript Object Notation (JSON)** is an open-standard file format that uses human-readable text to transmit data objects consisting of attribute–value pairs and array data types (or any other serializable value). It is a very common data format used for asynchronous browser–server communication, including as a replacement for XML in some AJAX-style systems. For more detail see <https://en.wikipedia.org/wiki/JSON>  
 
-json looks like below.(from wikipedia)  
+
+### Benefits  
+
+JSON offers the same kind of benefits that XML does for exchanging data in a heterogeneous environment, such as the following:  
+  
+  * **JSON is self-describing.** The syntax and hierachical sturucter of the JSON strings can in some cases be interpreted by applications that do not already know what data to expect.  
+  * **JSON is simple text.** This fact makes it suitable and safe for transferring across platforms and operating systems that do not readily share more complex document types. As text, JSON can also be readily displayed and edited in simple editors.  
+  * **JSON is compact.** An avearage JSON string is about two thirds of the size of the same data in XML.  
+  * **JSON is easy.** It is easy to learn, easy to read, and easy to understand.
 
 
-```{r graphics, out.width="400px",  Echo=FALSE}
+### Data types and syntax
+
+Because JSON is designed to be lightweight, it supports only four primitive data types : string, number, boolean, and null. 
+
+
+JSON looks like below.(from wikipedia)  
+
+```{r graphics, out.width="400px", echo=FALSE }
 knitr::include_graphics("jsonWiki.png")
 ```
+
+
 
 ## Read JSON in R
 
