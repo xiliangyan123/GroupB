@@ -1,0 +1,31 @@
+---
+title: "JsonData"
+author: "Sejin Lim"
+date: "June 8, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## About JSON
+
+**JavaScript Object Notation(JSON)** is a data interchange format created from a subset of JavaScript. JSON's appeal as an slthernative XML comes from smaller HTTP messages and less complicated syntax. The smaller message and simpler syntax can provide a significant performance advantage over XML. For more details see <https://documentation.progress.com>
+
+
+```{r cars}
+summary(cars)
+```
+
+## Read JSON in R
+
+To read JSON data type, we need to install some pacakage such as `jsonlite`. 
+
+```{r pressure, echo=FALSE}
+library(jsonlite)
+data<-fromJSON("C:/Users/slim22/ProjectData.json")
+
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
