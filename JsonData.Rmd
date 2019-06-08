@@ -41,24 +41,29 @@ knitr::include_graphics("jsonWiki.png")
 ```
 
 
-
 ## Read JSON in R
 
 To read JSON data type, we need to install some pacakage such as `jsonlite`. Then using `fromJSON` function, we can read the data easily. 
 For the practice, bring JSON data sample from <https://catalog.data.gov/dataset/age-adjusted-death-rates-for-the-top-10-leading-causes-of-death-united-states-2013>. 
 
 
-```{r pressure, echo=TRUE, warning=FALSE}
+```{r, echo=TRUE, warning=FALSE}
 ## install.package("jsonlite")
 library(jsonlite)
 
 data<-fromJSON("C:/Users/slim22/ProjectData.json")
-subdata<- data.frame(data$data[,c(9,11,12,13,14)])
-colnames(subdata) <- c("Year", "Cause", "State", "Deaths", "Age") 
+subdata<- data.frame(data$data[,c(9,11,12,13)])
+colnames(subdata) <- c("Year", "Cause", "State", "Deaths") 
 
 subdata$Deaths <- as.numeric(subdata$Deaths)
-subdata$Age <- as.numeric(subdata$Age)
 
 str(subdata)
 
 ```
+
+## Analysis
+
+### Numeric Summaries  
+
+### Visual Summaires
+
