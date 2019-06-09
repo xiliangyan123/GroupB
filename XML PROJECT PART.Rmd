@@ -8,3 +8,35 @@ output: html_document
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+#What is XML?
+Lets start to understand about Extensible Markup Language, or XML. To put in simple terms, XML is used to describe data. The XML language is useful for creating unique formats of data and electronically sharing structured data through the public internet and corporate networks. 
+
+The basic foundation of XML code is an element, defined by tags. If you are unsure what tags are, they are essentially lines of code starting with a beginning tag and ending with an ending tag:
+
+<*beginning tag*> **Element** <*/ending tag*>. 
+
+##What are its benefits?
+XML is a good way to store data for several reasons. One, it can be very simple to store the data. It can take large chunks of information and consolidate them into an XML document - meaning that it can effectively organize and provide structure to the user in understanding the data.  Second, XML data is self-describing, meaning that the structure of the data is already embedded with the data. When the data arrives, there is no need to pre-build the structure of the data.
+
+If you're interested in learning more, please visit [this website](https://searchmicroservices.techtarget.com/definition/XML-Extensible-Markup-Language)!
+
+##What if I want to read/manipulate XML data in R??
+Lets say that you were working on a project in R that required you to read in an XML dataset and manipulate data. Here is a step by step process of reading it in:
+
+Download and use the methods package and XML package. Note that R is "case sensitive". To read in data, use the function called xmlParse(file="path"). 
+
+```{r example}
+library(XML)
+library(methods)
+
+xmlData <- xmlParse(file = "Dataset.xml")
+xmlData
+
+xmlDatasize <- xmlRoot(xmlData)
+xmlDatasize
+```
+
+
+
+
