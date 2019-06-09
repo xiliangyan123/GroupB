@@ -51,19 +51,58 @@ For the practice, bring JSON data sample from <https://catalog.data.gov/dataset/
 ## install.package("jsonlite")
 library(jsonlite)
 
-data<-fromJSON("C:/Users/slim22/ProjectData.json")
+data<-fromJSON("ProjectData.json")
 subdata<- data.frame(data$data[,c(9,11,12,13)])
 colnames(subdata) <- c("Year", "Cause", "State", "Deaths") 
 
-subdata$Deaths <- as.numeric(subdata$Deaths)
-
+subdata$Deaths <- as.numeric(subdata$Death)
 str(subdata)
 
 ```
 
 ## Analysis
 
+```{r echo=FALSE, include =FALSE, results = 'hide'}
+library(DT)
+library(tidyverse)
+library(dplyr)
+```
+
+###Top causes of death in North Carolina 2016
+```{r echo=FALSE, include =FALSE, results = 'hide'}
+#Change the State and Cause columns from factors to characters.
+subdata$State <- as.character(subdata$State)
+subdata$Cause <- as.character(subdata$Cause)
+
+#Filter for 2016 and NC then sort by death in descending order.
+subdata2016 <- filter(subdata, Year == 2016)
+subdata2016NC <- filter(subdata2016, State == "North Carolina")
+subdata2016NC <- subdata2016NC %>% arrange(desc(Deaths))
+NC2016 <- subdata2016NC %>% select(Cause, Deaths)
+
+#Data set with Alzheimer's disease or no Alzheimer's disease during 2014 to 2016, in NC, NY, or Ca. 
+subdata$Cause <- ifelse(subdata$Cause != "Alzheimer's disease", 'No Alzheimers disease', 'Alzheimers disease')
+subdata1 <- filter(subdata, Year == 2014 | Year == 2015  | Year == 2016)
+subdata1 <- filter(subdata1, State == "North Carolina" | State =="New York" | State =="California")
+
+```
+
 ### Numeric Summaries  
 
-### Visual Summaires
+```{r, echo=FALSE}
+#data table with the 2016 NC top causes of death
+knitr::kable(NC2016, caption= "Top Causes of Death in North Carolina in the Year 2016")
 
+datatable(subdata1)
+```
+
+### Visual Summaires
+```{r, echo=FALSE}
+#Graph of 2016 NC top 5 deaths 
+NC2016 <- NC2016[1:5, ]
+Plot1 <- ggplot(NC2016, aes(x = Cause, y = Deaths))
+Plot1 + geom_bar(stat = "identity", fill="steelblue")
+
+#Side-by-side bar plot of Alzheimer's disease during 2014 to 2016, in NC, NY, or Ca. 
+ggplot(subdata1, aes(x = Year)) + geom_bar(aes(fill = Cause), position = "dodge") + facet_wrap( ~ State, labeller = label_both) + xlab("Female Crab Color") + scale_fill_discrete(name = "")
+```
