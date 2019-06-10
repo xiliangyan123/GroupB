@@ -102,10 +102,16 @@ In 2016, North Carolina #1 cause of Death was **Cancer** 19,523 people died(Rate
 ```{r, echo=FALSE, eval= TRUE}
 #Filter for 2016 and NC then sort by death in descending order.
 subdata2016NC <- subdata%>%filter(Year == 2016 & State == "North Carolina")%>% arrange(desc(Deaths))
-NC2016 <- subdata2016NC %>% select(Cause, Deaths, DeathRate)%>%filter(Cause!="All causes")
+NC2016 <- subdata2016NC %>% select(Year, Cause, Deaths, DeathRate)%>%filter(Cause!="All causes")
 
 knitr::kable(NC2016, caption= "Top 10 Causes of Death in North Carolina in the Year 2016")
 
+#NC death rates over the years. Created a scatter plot using this data in the visual section. 
+NCYears <- subdata %>% select(Year, State, Cause, DeathRate) %>% filter(State == "North Carolina" & Cause!="All causes")
+
+#Flu Death Rates in Ca, NY, and NC. Plotted in a histogram in the visual section. 
+Flu <- subdata %>% filter(Cause == "Influenza and pneumonia") %>% filter(State == "California" | State == "New York" | State == "North Carolina") %>% select(Year, Cause, State, DeathRate)
+datatable(Flu, caption= "Flu Death Rates in Ca, NY, and NC")
 ```
 
 
@@ -114,7 +120,8 @@ knitr::kable(NC2016, caption= "Top 10 Causes of Death in North Carolina in the Y
 #Graph of 2016 NC top 5 deaths 
 NC2016Top5 <- NC2016[1:5, ]
 Plot1 <- ggplot(NC2016Top5, aes(x = Cause, y = DeathRate))
-Plot1 + geom_bar(stat = "identity", fill="steelblue")
+Plot1 + geom_bar(stat = "identity", fill="steelblue") +
+ggtitle("Top 5 Causes of Death in North Carolina in 2016")
 
 ```
 
@@ -132,7 +139,7 @@ Newyork's 1st cause of death was Heart disease during 2014 to 2016 and it is hig
 #Filter for 2014~ 2016 and NC comparing to NY and California.
 subdata2016NNC <- subdata%>%filter((Year == 2014 | Year == 2015 | Year == 2016) & (State == "North Carolina" | State =="New York" | State =="California") &(Cause=="Cancer" | Cause=="Heart disease"))
 NNC2016 <- subdata2016NNC %>% select(Year, State, Cause, DeathRate)%>% arrange(Year, State, desc(DeathRate))
-DT::datatable(NNC2016, caption= "Top 2 Causes of Death in three states during the Year 2014 to 2016")
+DT::datatable(NNC2016, caption= "Top 2 Causes of Death in California, New York, and North Carolina from 2014 to 2016")
 
 ```
 
@@ -142,5 +149,19 @@ DT::datatable(NNC2016, caption= "Top 2 Causes of Death in three states during th
 
 #Side-by-side bar plot of top2 disease during 2014 to 2016, in NC, NY, or Ca. 
 Plot2 <- ggplot(NNC2016, aes(x = Year, y = DeathRate)) 
-Plot2 + geom_bar(stat = "identity", aes(fill = Cause), position = "dodge") + facet_wrap( ~ State, labeller = label_both) + xlab("Year") + scale_fill_discrete(name = "")
+Plot2 + geom_bar(stat = "identity", aes(fill = Cause), position = "dodge") + facet_wrap( ~ State, labeller = label_both) + xlab("Year") + scale_fill_discrete(name = "") +
+  ggtitle("Top Two Diseases from 2014 to 2016 in California, New York, and North Carolina")
+
+#Scatter Plot of NC death rate over the year with the cause as different colors. 
+ggplot(NCYears, aes(x=Year, y=DeathRate, color=Cause)) + 
+  geom_point() +
+  theme(axis.text.x = element_text(size = 7)) +
+  ggtitle("North Carolina Death Rate Over the Years")
+
+#Histogram of Flu Death Rates in Ca, NY, and NC
+p <- ggplot(Flu, aes(x=State, y=DeathRate)) + 
+  geom_boxplot()
+p <- p + geom_jitter(aes(color = DeathRate))
+print(p + ggtitle("Boxplot of Flu Death Rates in Ca, NY, and NC"))
 ```
+
