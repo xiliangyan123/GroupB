@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 #What is XML?
 Lets start to understand about Extensible Markup Language, or XML. To put in simple terms, XML is used to describe data. The XML language is useful for creating unique formats of data and electronically sharing structured data through the public internet and corporate networks. 
 
-The basic foundation of XML code is an element, defined by tags. If you are unsure what tags are, they are essentially lines of code starting with a beginning tag and ending with an ending tag:
+The basic foundation of XML code is an element, defined by tags. If ysou are unsure what tags are, they are essentially lines of code starting with a beginning tag and ending with an ending tag:
 
 <*beginning tag*> **Element** <*/ending tag*>. 
 
