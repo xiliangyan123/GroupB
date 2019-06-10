@@ -32,13 +32,19 @@ Download and use the methods package and XML package. Note that R is "case sensi
 
 ```{r example}
 library(XML)
+library(DT)
 library(methods)
 
-xmlData <- xmlParse(file = "Dataset.xml")
+xmlData <- xmlParse("xmldata.xml")
 xmlData
 
-xmlDatasize <- xmlRoot(xmlData)
-xmlDatasize
+Y <- xmlToDataFrame(node=getNodeSet(xmlData, "//year"))
+D <- xmlToDataFrame(node=getNodeSet(xmlData, "//cause_name"))
+De <- xmlToDataFrame(node=getNodeSet(xmlData, "//deaths"))
+S <- xmlToDataFrame(node=getNodeSet(xmlData, "//state"))
+
+xmlDataDf <- cbind(Y, D, DE, S)
+datatable(xmlDataDf)
 ```
 
 
