@@ -33,18 +33,35 @@ Download and use the methods package and XML package. Note that R is "case sensi
 ```{r example}
 library(XML)
 library(DT)
+library(dplyr)
 library(methods)
 
 xmlData <- xmlParse("xmldata.xml")
-xmlData
 
-Y <- xmlToDataFrame(node=getNodeSet(xmlData, "//year"))
-D <- xmlToDataFrame(node=getNodeSet(xmlData, "//cause_name"))
-De <- xmlToDataFrame(node=getNodeSet(xmlData, "//deaths"))
-S <- xmlToDataFrame(node=getNodeSet(xmlData, "//state"))
+Y <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//year")), "Year")
+D <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//cause_name")), "Cause")
+De <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//deaths")), "deaths")
+S <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//state")), "State")
+A <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//aadr")), "AADR")
 
-xmlDataDf <- cbind(Y, D, DE, S)
-datatable(xmlDataDf)
+xmlDataDf <- cbind(Y, D, De, S, A)
+#want to change variables to numeric
+xmlDataDf$AADR <- as.numeric(xmlDataDf$AADR)
+xmlDataDf$deaths <- as.numeric(xmlDataDf$deaths)
+
+#Want to change variables to character
+xmlDataDf$Cause <- as.character(xmlDataDf$Cause)
+xmlDataDf$State <- as.character(xmlDataDf$State)
+
+xmlDataDf2 <- xmlDataDf
+datatable(xmlDataDf2)
+
+ToGroup <- function(x, ...) {
+  xmlDataDf2 %>% group_by(State) %>% filter(Year == 2008 & State=="United States")
+}
+
+xmlDataDf3 <- ToGroup(xmlDataDf2)
+xmlDataDf3
 ```
 
 
