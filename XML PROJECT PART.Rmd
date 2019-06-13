@@ -52,16 +52,33 @@ xmlDataDf$deaths <- as.numeric(xmlDataDf$deaths)
 #Want to change variables to character
 xmlDataDf$Cause <- as.character(xmlDataDf$Cause)
 xmlDataDf$State <- as.character(xmlDataDf$State)
+xmlDataDf$Year  <- as.character(xmlDataDf$Year)
 
 xmlDataDf2 <- xmlDataDf
 datatable(xmlDataDf2)
 
-ToGroup <- function(x, ...) {
-  xmlDataDf2 %>% group_by(State) %>% filter(Year == 2008 & State=="United States")
+ToGroupUSA <- function(df, na.rm=TRUE, ...) {
+  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="United States" & Cause!= "All causes") %>% arrange(Year) 
 }
 
-xmlDataDf3 <- ToGroup(xmlDataDf2)
-xmlDataDf3
+ToGroupNC <- function(df1, na.rm=TRUE, ...){
+  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="North Carolina" & Cause!= "All causes") %>% arrange(Year)
+}
+
+xmlUSADataDf <- ToGroupUSA(xmlDataDf2)
+xmlUSADataDf
+
+xmlNCDataDf <- ToGroupNC(xmlDataDf2)
+xmlNCDataDf
+
+names(xmlUSADataDf) <- c("Year", "US Cause", "US Deaths", "USA Country", "USA AADR")
+xmlUSADataDf
+
+names(xmlNCDataDf) <- c("Year", "NC Cause", "NC Deaths", "NC State", "NC AADR")
+xmlNCDataDf
+
+xmlCombn <- cbind(xmlUSADataDf, xmlNCDataDf) 
+xmlCombn
 ```
 
 
