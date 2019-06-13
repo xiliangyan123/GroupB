@@ -9,34 +9,57 @@ output:
     toc_depth: 3  
 ---
 
-```{r setup, include=FALSE}
+```{r setup, include=FALSE, message=FALSE, warning=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-#What is XML?
-Lets start to understand about Extensible Markup Language, or XML. To put in simple terms, XML is used to describe data. The XML language is useful for creating unique formats of data and electronically sharing structured data through the public internet and corporate networks. 
+#Intro to XML
+Lets start to understand about *Extensible Markup Language*, or XML. 
 
-The basic foundation of XML code is an element, defined by tags. If ysou are unsure what tags are, they are essentially lines of code starting with a beginning tag and ending with an ending tag:
+To put in simple terms, XML is used to **describe data**. 
+
+The XML language is useful for creating unique formats of data and electronically sharing structured data through the public internet and corporate networks. 
+
+The basic foundation of XML code is an *element*, defined by *tags*. If you are unsure what tags are, they are essentially lines of code starting with a beginning tag and ending with an ending tag:
 
 <*beginning tag*> **Element** <*/ending tag*>. 
 
-##What are its benefits?
-XML is a good way to store data for several reasons. One, it can be very simple to store the data. It can take large chunks of information and consolidate them into an XML document - meaning that it can effectively organize and provide structure to the user in understanding the data.  Second, XML data is self-describing, meaning that the structure of the data is already embedded with the data. When the data arrives, there is no need to pre-build the structure of the data.
+##Benefits
+XML is a good way to store data for several reasons. 
+
+1. XML is a very simple medium to store the data. 
+2. It can take large chunks of information and consolidate them into an XML document - meaning that it can effectively organize and provide structure to the user in understanding the data.  
+3. XML data is self-describing, meaning that the structure of the data is already embedded with the data. When the data arrives, there is no need to pre-build the structure of the data.
 
 If you're interested in learning more, please visit [this website](https://searchmicroservices.techtarget.com/definition/XML-Extensible-Markup-Language)!
 
-##What if I want to read/manipulate XML data in R??
-Lets say that you were working on a project in R that required you to read in an XML dataset and manipulate data. Here is a step by step process of reading it in:
+##Read/Manipulate Data
+To begin reading in XML data, follow these steps:
 
-Download and use the methods package and XML package. Note that R is "case sensitive". To read in data, use the function called xmlParse(file="path"). 
+1. Load in the XML package
+2. Apply the xmlParse("Path to file") to begin reading in your XML file. 
+3. Grab a node/component from the file using xmlToDataframe
+  + This creates a dataframe of factors for each node read in. 
+4. Be Creative with how you manipulate your data!
 
-```{r example}
+##Description of Data
+
+```{r data}
 library(XML)
 library(DT)
 library(dplyr)
 library(methods)
+library(tidyverse)
+
+#The xmlParse() comes from the XML package in R. 
+#This is used commonly to parse or analyze each component of an XML file. 
+#This helps to generate an R structure representing the XML tree. 
 
 xmlData <- xmlParse("xmldata.xml")
+
+# The xmlToDataframe() enables us to extract data from a simple xml document.  
+# The nodes option entails a list of XML nodes (components), which are to be processed
+# The getNodeSet() enables us to access a specific part of our xml file. 
 
 Y <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//year")), "Year")
 D <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//cause_name")), "Cause")
@@ -45,40 +68,85 @@ S <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//state")), "State")
 A <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//aadr")), "AADR")
 
 xmlDataDf <- cbind(Y, D, De, S, A)
-#want to change variables to numeric
-xmlDataDf$AADR <- as.numeric(xmlDataDf$AADR)
-xmlDataDf$deaths <- as.numeric(xmlDataDf$deaths)
+str(xmlDataDf)
 
-#Want to change variables to character
+options(digits = 10)
+xmlDataDf$AADR <- as.numeric(as.character(xmlDataDf$AADR))
+xmlDataDf$deaths <- as.numeric(as.character(xmlDataDf$deaths))
+xmlDataDf$Year  <- as.numeric(as.character(xmlDataDf$Year))
+
 xmlDataDf$Cause <- as.character(xmlDataDf$Cause)
 xmlDataDf$State <- as.character(xmlDataDf$State)
-xmlDataDf$Year  <- as.character(xmlDataDf$Year)
 
 xmlDataDf2 <- xmlDataDf
-datatable(xmlDataDf2)
 
+#Create Functions to get info from US and NC
 ToGroupUSA <- function(df, na.rm=TRUE, ...) {
-  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="United States" & Cause!= "All causes") %>% arrange(Year) 
+  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="United States" & Cause!= "All causes") %>% arrange(Cause) 
 }
-
 ToGroupNC <- function(df1, na.rm=TRUE, ...){
-  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="North Carolina" & Cause!= "All causes") %>% arrange(Year)
+  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="North Carolina" & Cause!= "All causes") %>% arrange(Cause)
 }
 
 xmlUSADataDf <- ToGroupUSA(xmlDataDf2)
-xmlUSADataDf
-
 xmlNCDataDf <- ToGroupNC(xmlDataDf2)
-xmlNCDataDf
-
-names(xmlUSADataDf) <- c("Year", "US Cause", "US Deaths", "USA Country", "USA AADR")
-xmlUSADataDf
-
-names(xmlNCDataDf) <- c("Year", "NC Cause", "NC Deaths", "NC State", "NC AADR")
-xmlNCDataDf
-
+names(xmlUSADataDf) <- c("Year", "US-Causes", "US-Deaths", "Location:USA", "USA-AADR")
+names(xmlNCDataDf) <- c("Year", "NC-Causes", "NC-Deaths", "Location:NC", "NC-AADR")
 xmlCombn <- cbind(xmlUSADataDf, xmlNCDataDf) 
-xmlCombn
+
+options(digits = 5)
+xmlCombn1 <- xmlCombn %>% mutate(NCtoUSRatio = `NC-Deaths`/`US-Deaths`) %>% select(Year, `US-Causes`,`NC-Deaths`, `US-Deaths`, NCtoUSRatio) 
+names(xmlCombn1) <- c("Year", "Causes", "NC-Deaths", "US-Deaths", "NCtoUSRatio")
+xmlCombn1
+
+```
+
+
+```{r Csummaries}
+library(knitr)
+library(dplyr)
+
+xmlCT <- xmlDataDf2 %>% group_by(Year) %>% select(Year, State, Cause, deaths) %>% filter((State=="California" | State=="Texas" | State=="Florida") & (Year==2008 | Year==2010 | Year==2012) & (Cause!="All causes")) %>% arrange(Year)
+
+GetQuant <- function(df2, na.rm=TRUE, ...) {
+  xmlCT %>% mutate(level=ifelse(deaths > 10000, "Over 10k deaths", "Under 10k deaths"))
+}
+
+xmlCT1 <- GetQuant(xmlCT)
+
+xmlCT2 <- table(xmlCT1$State, xmlCT1$Cause, xmlCT1$level)
+kable(xmlCT2[1, 1:10, 1:2], align='r', caption = "California with more/less than 10k deaths in 2008, 2010, 2012")
+kable(xmlCT2[2, 1:10, 1:2], align='r', caption = "Texas with more/less than 10k deaths in 2008, 2010, 2012")
+kable(xmlCT2[3, 1:10, 1:2], align='r', caption = "Florida with more/less than 10k in during 2008, 2010, 2012")
+
+```
+
+```{r Nsummaries}
+library(knitr)
+xmlCAdf <- filter(xmlCT, State=="California" & Cause=="Heart disease")
+
+xmlCAqu <- sapply(xmlCAdf[, 4], quantile)
+xmlCAmean <- sapply(xmlCAdf[, 4], mean)
+xmlCAcombn <- rbind(xmlCAqu, xmlCAmean)
+row.names(xmlCAcombn) <- c("Min", "1st Qu.", "Median", "3rd Qu.", "Max", "Mean")
+kable(xmlCAcombn, caption="Summary of Heart Disease Deaths in CA through 3 Years")
+
+xmlTXdf <- filter(xmlCT, State=="Texas" & Cause=="Heart disease")
+
+xmlTXqu <- sapply(xmlTXdf[, 4], quantile)
+xmlTXmean <- sapply(xmlTXdf[, 4], mean)
+xmlTXcombn <- rbind(xmlTXqu, xmlTXmean)
+row.names(xmlTXcombn) <- c("Min", "1st Qu.", "Median", "3rd Qu.", "Max", "Mean")
+kable(xmlTXcombn, caption="Summary of Heart Disease Deaths in TX through 3 Years")
+
+xmlFLdf <- filter(xmlCT, State=="Florida" & Cause=="Heart disease")
+
+xmlFLqu <- sapply(xmlFLdf[, 4], quantile)
+xmlFLmean <- sapply(xmlFLdf[, 4], mean)
+xmlFLcombn <- rbind(xmlFLqu, xmlFLmean)
+row.names(xmlFLcombn) <- c("Min", "1st Qu.", "Median", "3rd Qu.", "Max", "Mean")
+kable(xmlFLcombn, caption="Summary of Heart Disease Deaths in TX through 3 Years")
+
 ```
 
 
