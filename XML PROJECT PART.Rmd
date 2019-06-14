@@ -1,6 +1,6 @@
 ---
 title: "XML Side Project"
-author: "Michael Yan"
+author: "Group B XML Partners"
 date: "June 9, 2019"
 output: 
   html_document:  
@@ -10,7 +10,7 @@ output:
 ---
 
 ```{r setup, include=FALSE, message=FALSE, warning=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning=FALSE)
 ```
 
 #Intro to XML
@@ -44,7 +44,7 @@ To begin reading in XML data, follow these steps:
 
 ##Description of Data
 
-```{r data}
+```{r data, echo=TRUE}
 library(XML)
 library(DT)
 library(dplyr)
@@ -68,39 +68,53 @@ S <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//state")), "State")
 A <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//aadr")), "AADR")
 
 xmlDataDf <- cbind(Y, D, De, S, A)
-str(xmlDataDf)
+#creating a dataset
 
 options(digits = 10)
+#Create numeric variables
 xmlDataDf$AADR <- as.numeric(as.character(xmlDataDf$AADR))
 xmlDataDf$deaths <- as.numeric(as.character(xmlDataDf$deaths))
 xmlDataDf$Year  <- as.numeric(as.character(xmlDataDf$Year))
-
+# Create Character Variables
 xmlDataDf$Cause <- as.character(xmlDataDf$Cause)
 xmlDataDf$State <- as.character(xmlDataDf$State)
 
 xmlDataDf2 <- xmlDataDf
+str(xmlDataDf2)
+```
+
+#Retreiving our Data
+```{r}
+library(knitr)
+library(ggplot2)
 
 #Create Functions to get info from US and NC
 ToGroupUSA <- function(df, na.rm=TRUE, ...) {
-  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="United States" & Cause!= "All causes") %>% arrange(Cause) 
+  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="United States" & Cause!= "All causes") %>% arrange(deaths) 
 }
 ToGroupNC <- function(df1, na.rm=TRUE, ...){
-  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="North Carolina" & Cause!= "All causes") %>% arrange(Cause)
+  xmlDataDf2 %>% group_by(Year) %>% filter(Year == 2010 & State=="North Carolina" & Cause!= "All causes") %>% arrange(deaths)
 }
 
 xmlUSADataDf <- ToGroupUSA(xmlDataDf2)
-xmlNCDataDf <- ToGroupNC(xmlDataDf2)
 names(xmlUSADataDf) <- c("Year", "US-Causes", "US-Deaths", "Location:USA", "USA-AADR")
+
+xmlNCDataDf <- ToGroupNC(xmlDataDf2)
 names(xmlNCDataDf) <- c("Year", "NC-Causes", "NC-Deaths", "Location:NC", "NC-AADR")
+
 xmlCombn <- cbind(xmlUSADataDf, xmlNCDataDf) 
 
+# Create a new variable 
 options(digits = 5)
-xmlCombn1 <- xmlCombn %>% mutate(NCtoUSRatio = `NC-Deaths`/`US-Deaths`) %>% select(Year, `US-Causes`,`NC-Deaths`, `US-Deaths`, NCtoUSRatio) 
+xmlCombn1 <- xmlCombn %>% mutate(NCtoUSRatio = `NC-Deaths`/`US-Deaths`) %>% select(Year, `US-Causes`,`NC-Deaths`, `US-Deaths`, NCtoUSRatio) %>% arrange(-NCtoUSRatio)
+
 names(xmlCombn1) <- c("Year", "Causes", "NC-Deaths", "US-Deaths", "NCtoUSRatio")
-xmlCombn1
+kable(xmlCombn1, caption = "Comparing National and State deaths")
 
+NCtop3 <- xmlCombn1[1:3, ]
+g <- ggplot(NCtop3, aes(x=Causes, y=NCtoUSRatio))
+g + geom_bar(stat = "identity", fill="green") + labs(title = "Top 3 Causes of Death by Proportion")
 ```
-
 
 ```{r Csummaries}
 library(knitr)
@@ -114,10 +128,8 @@ GetQuant <- function(df2, na.rm=TRUE, ...) {
 
 xmlCT1 <- GetQuant(xmlCT)
 
-xmlCT2 <- table(xmlCT1$State, xmlCT1$Cause, xmlCT1$level)
-kable(xmlCT2[1, 1:10, 1:2], align='r', caption = "California with more/less than 10k deaths in 2008, 2010, 2012")
-kable(xmlCT2[2, 1:10, 1:2], align='r', caption = "Texas with more/less than 10k deaths in 2008, 2010, 2012")
-kable(xmlCT2[3, 1:10, 1:2], align='r', caption = "Florida with more/less than 10k in during 2008, 2010, 2012")
+xmlCT2 <- table(xmlCT1$Year, xmlCT1$Cause, xmlCT1$level)
+kable(xmlCT2[1, 1:10, 1:2], align='r', caption = "Occurrences of causes in California with more/less than 10k deaths in 2008, 2010, 2012")
 
 ```
 
@@ -126,10 +138,10 @@ library(knitr)
 xmlCAdf <- filter(xmlCT, State=="California" & Cause=="Heart disease")
 
 xmlCAqu <- sapply(xmlCAdf[, 4], quantile)
-xmlCAmean <- sapply(xmlCAdf[, 4], mean)
+xmlCAmean <- mean(xmlCAdf[[4]])
 xmlCAcombn <- rbind(xmlCAqu, xmlCAmean)
 row.names(xmlCAcombn) <- c("Min", "1st Qu.", "Median", "3rd Qu.", "Max", "Mean")
-kable(xmlCAcombn, caption="Summary of Heart Disease Deaths in CA through 3 Years")
+kable(xmlCAcombn, caption="Summary of Heart Disease Deaths in CA through 2008, 2010, 2012")
 
 xmlTXdf <- filter(xmlCT, State=="Texas" & Cause=="Heart disease")
 
@@ -149,6 +161,17 @@ kable(xmlFLcombn, caption="Summary of Heart Disease Deaths in TX through 3 Years
 
 ```
 
+```{r plots}
+library(ggplot2)
+library(dplyr)
 
+options(digits = 10)
+xmlData3 <- xmlDataDf2 %>% filter((Year==2008| Year==2010 | Year==2012) & (State=="California" | State=="Texas" | State=="Florida") & (Cause=="Suicide" | Cause== "Alzheimer's disease"))
 
+g <- ggplot(xmlData3, aes(x=as.factor(Year), y=AADR))
+g + geom_bar(stat="identity", aes(fill= Cause), position = "dodge") + facet_wrap(~ State) + ylab("Age Adjusted Death Rate") + xlab("Year") + ggtitle("Change in Alzheimer's disease and suicide death rates in 3 year period")
 
+b <- ggplot(xmlData3, aes(x=as.factor(Year), y=AADR))
+b + geom_boxplot() + geom_jitter(aes(col=State)) + xlab("Year") + ylab("Age Adjusted Death Rate") + ggtitle("Box Plot of AADR in 3 Largest States in 3 year period")
+
+```
