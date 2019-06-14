@@ -1,7 +1,7 @@
 ---
 title: "JSONData"
 author: "GroupB JSON Partners"
-date: "June 9, 2019"
+date: "June 14, 2019"
 output:   
   html_document:  
     toc: yes  
@@ -13,52 +13,74 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## About JSON
+## About JSON  
+  
+  
+**JSON(JavaScript Object Notation)** is a lightweight text-based open standard designed for human-readable data interchange. Conventions used by JSON are known to programmers, which include C, C++, Java, Python, Perl, etc. The filename extension is **.json.**  
+  
+  
+### uses of JSON  
+  
+  * It is used while writing JavaScript based applications that includes browser extensions and websites.  
+  * JSON format is used for serializing and transmitting structured data over network connection.  
+  * It is primarily used to transmit data between a server and web applications.  
+  * Web services and APIs use JSON format to provide public data.  
+  * It can be used with modern programming languages.  
 
-In computing, **JavaScript Object Notation (JSON)** is an open-standard file format that uses human-readable text to transmit data objects consisting of attribute–value pairs and array data types (or any other serializable value). It is a very common data format used for asynchronous browser–server communication, including as a replacementA for XML in some AJAX-style systems. 
 
-
-### Benefits of JSON 
-
+### Benefits of JSON   
+  
 JSON offers the same kind of benefits that XML does for exchanging data in a heterogeneous environment, such as the following:  
   
   * **JSON is self-describing.** The syntax and hierachical structer of the JSON strings can in some cases be interpreted by applications that do not already know what data to expect.  
   * **JSON is simple text.** This fact makes it suitable and safe for transferring across platforms and operating systems that do not readily share more complex document types. As text, JSON can also be readily displayed and edited in simple editors.  
   * **JSON is compact.** An avearage JSON string is about two thirds of the size of the same data in XML.  
-  * **JSON is easy.** It is easy to learn, easy to read, and easy to understand.
-
-
-### Data types and syntax  
-
+  * **JSON is easy.** It is easy to learn, easy to read, and easy to understand.  
+  
+  
+### Data types and syntax    
+  
 JSON format supports the following data types:  
 
-  **1. Number** : a signed decimal number that may contain a fractional part and may use exponential E notation, but cannot include non-numbers such as NaN. The format makes no distinction between integer and floating-point. JavaScript uses a double-precision floating-point format for all its numeric values, but other languages implementing JSON may encode numbers differently.    
-  **2. String** : a sequence of zero or more Unicode characters. Strings are delimited with double-quotation marks and support a backslash escaping syntax.   
-  **3. Boolean** : either of the values `true` or `false`  
-  **4. Array** : an ordered list of zero or more values, each of which may be of any type. Arrays use square bracket notation and elements are comma-separated.   
-  **5. Object** : an unordered collection of name–value pairs where the names (also called keys) are strings. Since objects are intended to represent associative arrays,it is recommended, though not required,that each key is unique within an object. Objects are delimited with curly brackets and use commas to separate each pair, while within each pair the colon ':' character separates the key or name from its value.  
-  **6. Null** : An empty value, using the word `null`  
+  **Types**      | **Description**
+  ---------------|-------------------------------------------------------------------------------------------------------------------------------------------------
+  **Number**     | double- precision floating-point format in JavaScript (eg. Integer, Fraction, Expenent)   
+  **String**     | double-quoted Unicode with backslash escaping (eg. ", \, /, b(backspace), f(form feed), n(new line), r(carriage return), t(horizontal tab).. )   
+  **Boolean**    | true or false  
+  **Array**      | an ordered sequence of values    
+  **Value**      | it can be a string, a number, true or false, null etc  
+  **Object**     | an unordered collection of key:value pairs  
+  **Whitespace** | can be used between any pair of tokens  
+  **Null**       | empty  
+
   
   
-#### Simple example in JSON 
+JSON syntax is basically considered as a subset of JavaScript syntax; it includes the following:  
+
+  * Data is represented in name/value pairs.  
+  * Curly braces hold objects and each name is followed by ':'(colon), the name/value pairs are separated by , (comma).  
+  * Square brackets hold arrays and values are separated by ,(comma).  
+  
+**Simple syntax example in JSON** 
 
 ```{r graphics, out.width="400px", echo=FALSE }
 knitr::include_graphics("jsonWiki.png")
 ```
 
-For more detail see <https://en.wikipedia.org/wiki/JSON>  
+*For more detail about JSON see <https://www.tutorialspoint.com/json/json_overview.htm>*  
+  
+  
+  
+## Read and Manipulate JSON  
 
 
-
-## Read JSON in R
-
-To read JSON data type, we need to install some pacakage such as `jsonlite`. Then, we can read the data easily using `fromJSON` function. 
-
+To read JSON data type,we need to install some pacakage such as `jsonlite`. Then, we can read the data easily using `fromJSON` function.  
+  
 For the practice, bring JSON data sample (which have three categorical variables and two quantitative variables) from [NCHS-Leading Causes of Death:United States](https://catalog.data.gov/dataset/age-adjusted-death-rates-for-the-top-10-leading-causes-of-death-united-states-2013).  
-
+  
 *This dataset presents the age-adjusted death rates for the 10 leading causes of death in the United States beginning in 1999. Data are based on information from all resident death certificates filed in the 50 states and the District of Columbia using demographic and medical characteristics. Age-adjusted death rates (per 100,000 population) are based on the 2000 U.S. standard population.*
 
-Since there is no column names in JSON dataset, add the column names using `colnames()` function. 
+Since there is no column names in JSON dataset, add the column names using `colnames()` function.  
 
 ```{r, echo=TRUE, warning=FALSE}
 ## install.package("jsonlite")
@@ -77,32 +99,33 @@ subdata$DeathRate <- as.numeric(as.character(subdata$DeathRate))
 str(subdata)
 
 ```
+  
+  
+  
+## Analysis 
 
-## Analysis
 
 ```{r echo=FALSE, include =FALSE, results = 'hide'}
 library(DT)
 library(tidyverse)
 library(dplyr)
 ```
-
-### Create a new variable
-```{r, echo=TRUE, warning=FALSE}
-subdata <- subdata%>%mutate(RealDeathRate=DeathRate)
-
-```
-
+  
+  
 ### Top 10 causes of death in North Carolina  
-
-
+  
+  
 #### Numeric Summaries
-
-In 2016, North Carolina #1 cause of Death was **Cancer** 19,523 people died(Rate is 162 per 100,000).  
-
+  
+We can see North Carolina #1 cause of Death was **Cancer** 19,523 people died(Rate is 162 per 100,000) in 2016.  
+  
 ```{r, echo=FALSE, eval= TRUE}
-#Filter for 2016 and NC then sort by death in descending order.
-subdata2016NC <- subdata%>%filter(Year == 2016 & State == "North Carolina")%>% arrange(desc(Deaths))
-NC2016 <- subdata2016NC %>% select(Year, Cause, Deaths, DeathRate)%>%filter(Cause!="All causes")
+#Create a function to get subdataset.
+dataYearState <- function(x, y, ...){
+               subdata%>%filter(Year == x & State == y)%>% arrange(desc(Deaths))
+              }
+#Filter for 2016 and NC then sort by death in descending order
+NC2016 <- dataYearState(2016, "North Carolina") %>% select(Year, Cause, Deaths, DeathRate)%>%filter(Cause!="All causes")
 
 knitr::kable(NC2016, caption= "Top 10 Causes of Death in North Carolina in the Year 2016")
 
@@ -113,7 +136,7 @@ NCYears <- subdata %>% select(Year, State, Cause, DeathRate) %>% filter(State ==
 
 
 #### Visual Summaries  
-
+  
 ```{r, echo=FALSE, eval= TRUE}
 #Graph of 2016 NC top 5 deaths 
 NC2016Top5 <- NC2016[1:5, ]
@@ -129,10 +152,12 @@ ggplot(NCYears, aes(x=Year, y=DeathRate, color=Cause)) +
 
 ```
 
+ 
 
-### Causes of death in California, New York, and North Carolina  
+### Causes of death in California, New York, and North Carolina   
 
-#### Numeric Summaries  
+  
+#### Numeric Summaries    
 
 California's 1st and 2nd cause of death were very similar during 2014 to 2016.  
 North Carolina's 1st cause of death was cancer during 2014 to 2016. But Cancer Death Rate have been improved.  
@@ -160,7 +185,7 @@ datatable(Flu, caption= "Flu Death Rates in Ca, NY, and NC")
 #Side-by-side bar plot of top2 disease during 2014 to 2016, in NC, NY, or Ca. 
 Plot2 <- ggplot(NNC2016, aes(x = Year, y = DeathRate)) 
 Plot2 + geom_bar(stat = "identity", aes(fill = Cause), position = "dodge") + facet_wrap( ~ State, labeller = label_both) + xlab("Year") + scale_fill_discrete(name = "") +
-  ggtitle("Top Two Diseases from 2014 to 2016 in California, New York, and North Carolina")
+  ggtitle("Top Two Diseases from 2014 to 2016 in Ca, NY, and NC")
 
 
 #Histogram of Flu Death Rates in Ca, NY, and NC
