@@ -9,7 +9,7 @@ output:
     toc_depth: 3  
 ---
 
-```{r setup, include=FALSE, message=FALSE, warning=FALSE}
+```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning=FALSE)
 ```
 
@@ -33,7 +33,12 @@ XML is a good way to store data for several reasons.
 
 If you're interested in learning more, please visit [this website](https://searchmicroservices.techtarget.com/definition/XML-Extensible-Markup-Language)!
 
-##Read/Manipulate Data
+##Description of Data
+We have chosen a census dataset from the National Center for Health Statistics, that presents the age-adjusted death rates for the 10 leading causes of death in the US beginning in 1999. Age-adjusted death rates are (per 100,000 population) based on the 2000 US standard population. 
+
+This data enables us to identify health problems in different states, and mainly document the health status of the popluation and of important subgroups. Below, you can find some relevant analyses of our data. 
+
+#Read/Manipulate Data
 To begin reading in XML data, follow these steps:
 
 1. Load in the XML package
@@ -41,8 +46,6 @@ To begin reading in XML data, follow these steps:
 3. Grab a node/component from the file using xmlToDataframe
   + This creates a dataframe of factors for each node read in. 
 4. Be Creative with how you manipulate your data!
-
-##Description of Data
 
 ```{r data, echo=TRUE}
 library(XML)
@@ -83,7 +86,13 @@ xmlDataDf2 <- xmlDataDf
 str(xmlDataDf2)
 ```
 
-#Retreiving our Data
+#Summary Analyses
+
+##2010 Top 10 leading causes of Death in NC
+This datatable presents the top 10 causes of Death in NC proportional to the total number of deaths in the United States. This is an important topic to discuss, because although the number of deaths itself is important, a proportion can give us more information about the deaths in the state of NC. 
+
+A larger proportion can tell us which causes are more affecting residents in NC, which can help us make decisions that benefit the majority of residents in NC suffering from these potential causes. Kidney disease has the highest proportion out of the top 10 causes of death in NC, so focusing on this can be a good step in the future in terms of health care. 
+
 ```{r}
 library(knitr)
 library(ggplot2)
@@ -98,7 +107,6 @@ ToGroupNC <- function(df1, na.rm=TRUE, ...){
 
 xmlUSADataDf <- ToGroupUSA(xmlDataDf2)
 names(xmlUSADataDf) <- c("Year", "US-Causes", "US-Deaths", "Location:USA", "USA-AADR")
-
 xmlNCDataDf <- ToGroupNC(xmlDataDf2)
 names(xmlNCDataDf) <- c("Year", "NC-Causes", "NC-Deaths", "Location:NC", "NC-AADR")
 
@@ -113,8 +121,13 @@ kable(xmlCombn1, caption = "Comparing National and State deaths")
 
 NCtop3 <- xmlCombn1[1:3, ]
 g <- ggplot(NCtop3, aes(x=Causes, y=NCtoUSRatio))
-g + geom_bar(stat = "identity", fill="green") + labs(title = "Top 3 Causes of Death by Proportion")
+g + geom_bar(stat = "identity", fill="green") + labs(title = "NC Top 3 Causes of Death by Proportion")
 ```
+
+##Contingency Table 
+The Idea of this table is centered around how frequent the State of California will have more than 10k deaths within the 3 year period. The number 10k represents our threshold, which indicates if this is a cause that needs to be focused primarily on. 
+
+Heart disease, Cancer, and Chronic Lower Respiratory Disease (CLRD), each have 2 or more instances of having over 10k deaths. From this data, we can see that these might be the top 3 causes of death that would need major focus on. By devoting more time and money to these fields, we can help a majority of the population prevent and cure these causes. 
 
 ```{r Csummaries}
 library(knitr)
@@ -133,15 +146,18 @@ kable(xmlCT2[1, 1:10, 1:2], align='r', caption = "Occurrences of causes in Calif
 
 ```
 
+##Summary Statistics Table
+In these analyses, we are focused on analyzing the 3 largest states and the top leading cause of death in those states, which is heart disease. These tables provide us with the measures of the mean, which in this case refers to the average number of deaths in 2008, 2010, and 2012, and more. We can also analyze the minimum and maximum of those values the deaths as well, and see that the rates of change for Texas and Florida are low, compared to California. 
+
 ```{r Nsummaries}
 library(knitr)
 xmlCAdf <- filter(xmlCT, State=="California" & Cause=="Heart disease")
 
 xmlCAqu <- sapply(xmlCAdf[, 4], quantile)
-xmlCAmean <- mean(xmlCAdf[[4]])
+xmlCAmean <- sapply(xmlCAdf[, 4], mean)
 xmlCAcombn <- rbind(xmlCAqu, xmlCAmean)
 row.names(xmlCAcombn) <- c("Min", "1st Qu.", "Median", "3rd Qu.", "Max", "Mean")
-kable(xmlCAcombn, caption="Summary of Heart Disease Deaths in CA through 2008, 2010, 2012")
+kable(xmlCAcombn, caption="Summary of Heart Disease Deaths in CA through 3 years")
 
 xmlTXdf <- filter(xmlCT, State=="Texas" & Cause=="Heart disease")
 
@@ -157,10 +173,17 @@ xmlFLqu <- sapply(xmlFLdf[, 4], quantile)
 xmlFLmean <- sapply(xmlFLdf[, 4], mean)
 xmlFLcombn <- rbind(xmlFLqu, xmlFLmean)
 row.names(xmlFLcombn) <- c("Min", "1st Qu.", "Median", "3rd Qu.", "Max", "Mean")
-kable(xmlFLcombn, caption="Summary of Heart Disease Deaths in TX through 3 Years")
+kable(xmlFLcombn, caption="Summary of Heart Disease Deaths in FL through 3 Years")
 
 ```
 
+##Graphical Representation of Data Analyses
+In this plot, our goal is to find patterns and trends in death and suicide over a 3 year period. We decided to choose these causes, since they are likely the two biggest causes that are less known or less treatable in this list. Focusing on something like this, we hope to obtain valuable data. 
+
+By plotting the age adjusted death rate, our trend shows that California's rates for alzheimer's disease and suicide are not showing any signs of improvement or decline. We see, however for Florida and Texas, that in this 3 year period, health services treating Alzheimer's disease and suicide are improving greatly, with a decline in death rate each year. 
+
+On the other hand, the boxplot with scattered points presents our measure of summary statistics. The end tails points presents our min/max values, the center presents our mean, and the start/end of the boxes presents our quartiles. What this plot ultimately represents is how spread out our data points are (which in this case are the states). We can analyze that in 2008, the death rate was the most spread out, perhaps due to external factors, such as the 2008 financial crisis. Over the years, we see that the means and end point values level off and decrease from 2008 to 2010 to 2012. 
+ 
 ```{r plots}
 library(ggplot2)
 library(dplyr)
