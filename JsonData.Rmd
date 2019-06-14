@@ -127,6 +127,12 @@ dataYearState <- function(x, y, ...){
 #Filter for 2016 and NC then sort by death in descending order
 NC2016 <- dataYearState(2016, "North Carolina") %>% select(Year, Cause, Deaths, DeathRate)%>%filter(Cause!="All causes")
 
+# Create a new variable 
+NCtot2016 <- dataYearState(2016, "North Carolina") %>% select(Year, Cause, Deaths, DeathRate)%>%filter(Cause=="All causes")
+NCtot2016 <- NCtot2016$Deaths
+options(digits = 2)
+NC2016 <- NC2016%>%mutate(CauseProp=Deaths/NCtot2016)%>%arrange(desc(CauseProp))
+
 knitr::kable(NC2016, caption= "Top 10 Causes of Death in North Carolina in the Year 2016")
 
 #NC death rates over the years. Created a scatter plot using this data in the visual section. 
@@ -136,13 +142,16 @@ NCYears <- subdata %>% select(Year, State, Cause, DeathRate) %>% filter(State ==
 
 
 #### Visual Summaries  
+
+We can see that the cancer occupies 22% of all cause of deaths, 20%, 6%, 6%, 5%, respectively in 2016.  
   
 ```{r, echo=FALSE, eval= TRUE}
 #Graph of 2016 NC top 5 deaths 
 NC2016Top5 <- NC2016[1:5, ]
-Plot1 <- ggplot(NC2016Top5, aes(x = Cause, y = DeathRate))
+Plot1 <- ggplot(NC2016Top5, aes(x = Cause, y = CauseProp, color=Cause))
 Plot1 + geom_bar(stat = "identity", fill="steelblue") +
-ggtitle("Top 5 Causes of Death in North Carolina in 2016")
+ggtitle("Top 5 Causes of Death in North Carolina in 2016")+
+scale_x_discrete(limits=c("Cancer","Heart disease","Unintentional injuries", "CLRD", "Stroke"))
 
 #Scatter Plot of NC death rate over the year with the cause as different colors. 
 ggplot(NCYears, aes(x=Year, y=DeathRate, color=Cause)) + 
@@ -158,10 +167,6 @@ ggplot(NCYears, aes(x=Year, y=DeathRate, color=Cause)) +
 
   
 #### Numeric Summaries    
-
-California's 1st and 2nd cause of death were very similar during 2014 to 2016.  
-North Carolina's 1st cause of death was cancer during 2014 to 2016. But Cancer Death Rate have been improved.  
-Newyork's 1st cause of death was Heart disease during 2014 to 2016 and it is higher than other two states.
 
 
 ```{r, echo=FALSE, eval= TRUE}
@@ -179,6 +184,10 @@ datatable(Flu, caption= "Flu Death Rates in Ca, NY, and NC")
 
   
 #### Visual Summaries  
+
+California's 1st and 2nd cause of death were very similar during 2014 to 2016.  
+North Carolina's 1st cause of death was cancer during 2014 to 2016. But Cancer Death Rate have been improved.  
+Newyork's 1st cause of death was Heart disease during 2014 to 2016 and it is higher than other two states.
 
 ```{r, echo=FALSE, eval= TRUE}
 
