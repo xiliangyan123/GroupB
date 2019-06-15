@@ -1,3 +1,108 @@
+
+---
+title: "Project1"
+author: "Anchal Saxena"
+date: "6/8/2019"
+output:
+  html_document:
+    df_print: paged
+    toc: true
+    toc_depth: 3
+---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning=FALSE)
+```
+# Intro to XML
+Describe your type of data (JSON or XML). What is it, where does it get used, and why is it a good
+way to store data?
+XML stands for *Extensible Markup Language*. 
+
+XML is used to **describe data** and to focus on **what data is**. In XML user can use custom definition, description and structure of data. These datasets then can be stored and shared in the user format across internet and other networks. 
+
+## Benefits
+Important characteristics of XML that make it useful in a variety of systems and solutions −
+
+1. XML is extensible − XML allows you to create your own self-descriptive tags, or language, that suits your application.
+
+2. XML carries the data, does not present it − XML allows you to store the data irrespective of how it will be presented.
+
+3. XML is a public standard − XML was developed by an organization called the World Wide Web Consortium (W3C) and is available as an open standard.
+
+For more informstion, visit [this website](https://www.tutorialspoint.com/xml/xml_overview.htm)!
+
+## Description of Data
+**NCHS - Leading Causes of Death: United States**, census dataset from the National Center for Health Statistics presents age-adjusted death rates for the 10 leading causes of death in the US beginning in 1999. Age-adjusted death rates are (per 100,000 population) based on the 2000 US standard population.
+
+To get detailed information,click [here](https://catalog.data.gov/dataset/age-adjusted-death-rates-for-the-top-10-leading-causes-of-death-united-states-2013). 
+
+# Read Data
+To begin reading in XML data, follow these steps:
+
+1. Load in the XML package
+2. Use xmlParse("Path to file") to read in your XML file. 
+3. Use xmlToDataframe to create a dataframe for each node in the xml data. 
+
+```{r data, echo=TRUE}
+library(XML)
+library(DT)
+library(dplyr)
+library(methods)
+library(tidyverse)
+#The xmlParse() comes from the XML package in R. 
+#This is used commonly to parse or analyze each component of an XML file. 
+#This helps to generate an R structure representing the XML tree. 
+xmlData <- xmlParse("http://data.cdc.gov/api/views/bi63-dtpu/rows.xml")
+#extract xml data to dtatframe 
+year <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//year")), "Year")
+cause <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//cause_name")), "Cause")
+deaths <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//deaths")), "Deaths")
+state <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//state")), "State")
+aadr <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//aadr")), "AADR")
+xmlDataDf <- cbind(year, cause, deaths, state, aadr)  
+str(xmlDataDf)
+
+options(digits = 10)
+#Convert AADR, Deaths & Year to numeric variables
+xmlDataDf$AADR <- as.numeric(xmlDataDf$AADR)
+xmlDataDf$Deaths <- as.numeric(xmlDataDf$Deaths)
+
+str(xmlDataDf)
+```
+
+# Data Analysis 
+
+```{r}
+library(knitr)
+library(ggplot2)
+#Create Functions to get info from US and NC
+last5yearSummary <- function(x, na.rm=TRUE, ...) {
+  totalDeathsByState <- xmlDataDf %>% group_by(Cause) %>% filter(Year %in% (2011:2016) & State == x & Cause!= "All causes") %>% mutate(totalDeaths = sum(Deaths), avgAADR = mean(AADR)) %>% select(State, Cause, totalDeaths, avgAADR)
+  return(Last5Year <- distinct(totalDeathsByState))
+}
+
+GeorgiaData <- last5yearSummary("Georgia")
+#Numeric Summary
+knitr::kable(GeorgiaData, caption= "Causes of Death in Georgia in Last 5 years (2011-2016)")
+```
+
+# Visual Summary - Quantitave
+```{r plots}
+library(ggplot2)
+library(dplyr)
+options(digits = 10)
+
+#Visual Summary
+g <- ggplot(GeorgiaData, aes(x=Cause, y=totalDeaths))
+g + geom_bar(stat = "identity", aes(fill= Cause)) + labs(title = "Causes of Deaths in Georgia over last 5 years") + scale_color_discrete(name="Cause of Death") + theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+
+SubData <- xmlDataDf %>% filter((Year %in% (2011:2016)) & (State %in% c( "Maine", "Vermont", "New Hampshire", "Massachusetts", "Rhode Island", "Connecticut")) & (Cause %in% c("Stroke" , "Heat disease")))
+
+g1 <- ggplot(SubData, aes(x=as.factor(Year), y=AADR))
+g1 + geom_boxplot() + geom_jitter(aes(col=State)) + xlab("Year") + ylab("Age Adjusted Death Rate") + ggtitle("Box Plot of AADR in last 5 years(2011-2016) in New England Area")
+```
+=======
 ---
 title: "Project1"
 author: "Anchal Saxena"
