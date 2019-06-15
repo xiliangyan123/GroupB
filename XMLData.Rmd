@@ -11,7 +11,6 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning=FALSE)
 ```
-
 # Intro to XML
 Describe your type of data (JSON or XML). What is it, where does it get used, and why is it a good
 way to store data?
