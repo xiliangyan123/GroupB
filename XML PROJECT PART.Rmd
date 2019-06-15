@@ -229,9 +229,10 @@ str(xmlDataDfA)
 
 #Plots Galore!
 
-## Data Analysis 
-The table provides us a summary of leading causes of deaths in  Georgia between 2011 and 2016. It shows the total number of deaths and average age adjusted death rate for each cause. We can see that from this table, the average death ratio and average of total deaths are highly correlated. 
-```{r}
+## Quantitative Data Analysis 
+The table provides us a summary of leading causes of deaths in  Georgia between 2011 and 2016. It shows the total number of deaths and average age adjusted death rate for each cause. We can see that from this table, the average death ratio and average of total deaths are highly correlated.
+
+```{r Summary}
 library(knitr)
 library(ggplot2)
 #Create Functions to get info from US and NC
