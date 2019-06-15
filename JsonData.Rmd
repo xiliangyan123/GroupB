@@ -19,7 +19,7 @@ knitr::opts_chunk$set(echo = TRUE)
 **JSON(JavaScript Object Notation)** is a lightweight text-based open standard designed for human-readable data interchange. Conventions used by JSON are known to programmers, which include C, C++, Java, Python, Perl, etc. The filename extension is **.json.**  
   
   
-### uses of JSON  
+### Uses of JSON  
   
   * It is used while writing JavaScript based applications that includes browser extensions and websites.  
   * JSON format is used for serializing and transmitting structured data over network connection.  
@@ -73,14 +73,22 @@ knitr::include_graphics("jsonWiki.png")
   
 ## Read and Manipulate JSON  
 
+To read JSON data type,we need to install some pacakages such as `jsonlite`. Then, we can read the data easily using the `fromJSON` function. The jsonlite package is a JSON parser/generator optimized for the web. It's main strength is that it implements a bidirectional mapping between JSON data and the most important R data types. Thereby we can convert between R objects and JSON without loss of type or information. 
 
-To read JSON data type,we need to install some pacakage such as `jsonlite`. Then, we can read the data easily using `fromJSON` function.  
-  
-For the practice, bring JSON data sample (which have three categorical variables and two quantitative variables) from [NCHS-Leading Causes of Death:United States](https://catalog.data.gov/dataset/age-adjusted-death-rates-for-the-top-10-leading-causes-of-death-united-states-2013).  
+  **Function Options in jsonlite**      | **Description**
+  ---------------|-------------------------------------------------------------------------------------------------------------------------------------------------
+  **`read_json`**     | to read or write JSON files   
+  **`toJSON` or `fromJSON`**     | to convert R objects to/from JSON   
+  **`unbox`**    | unbox a vector or data frame  
+  **`flatten`**      | Flatten nested data frames    
+
+###JSON Manipulation Practice
+
+For practice lets bring the JSON data sample (which have three categorical variables and two quantitative variables) from [NCHS-Leading Causes of Death:United States](https://catalog.data.gov/dataset/age-adjusted-death-rates-for-the-top-10-leading-causes-of-death-united-states-2013).  
   
 *This dataset presents the age-adjusted death rates for the 10 leading causes of death in the United States beginning in 1999. Data are based on information from all resident death certificates filed in the 50 states and the District of Columbia using demographic and medical characteristics. Age-adjusted death rates (per 100,000 population) are based on the 2000 U.S. standard population.*
 
-Since there is no column names in JSON dataset, add the column names using `colnames()` function.  
+Since there are no column names in the JSON dataset, add the column names using `colnames()` function.   
 
 ```{r, echo=TRUE, warning=FALSE}
 ## install.package("jsonlite")
@@ -137,7 +145,6 @@ knitr::kable(NC2016, caption= "Top 10 Causes of Death in North Carolina in the Y
 
 #NC death rates over the years. Created a scatter plot using this data in the visual section. 
 NCYears <- subdata %>% select(Year, State, Cause, DeathRate) %>% filter(State == "North Carolina" & Cause!="All causes")
-
 ```
 
 
@@ -151,14 +158,18 @@ NC2016Top5 <- NC2016[1:5, ]
 Plot1 <- ggplot(NC2016Top5, aes(x = Cause, y = CauseProp, color=Cause))
 Plot1 + geom_bar(stat = "identity", fill="steelblue") +
 ggtitle("Top 5 Causes of Death in North Carolina in 2016")+
+  theme(axis.text.x = element_text(size = 8.4))+
 scale_x_discrete(limits=c("Cancer","Heart disease","Unintentional injuries", "CLRD", "Stroke"))
+```
 
+The death rate from cancer, heart disease, and stroke have steadily decreased from 1999 to 2016 in North Carolina. The death rate from Alzheimer's disease, CLRD, Diabetes, Inlfuenza, Kidney disease, suicide, and unintentional injuries have remained relatively stable from 1999 to 2016.
+
+```{r, echo=FALSE, eval= TRUE}
 #Scatter Plot of NC death rate over the year with the cause as different colors. 
 ggplot(NCYears, aes(x=Year, y=DeathRate, color=Cause)) + 
   geom_point() +
   theme(axis.text.x = element_text(size = 7)) +
   ggtitle("North Carolina Death Rate Over the Years")
-
 ```
 
  
@@ -176,7 +187,7 @@ NNC2016 <- subdata2016NNC %>% select(Year, State, Cause, DeathRate)%>% arrange(Y
 DT::datatable(NNC2016, caption= "Top 2 Causes of Death in California, New York, and North Carolina from 2014 to 2016")
 
 
-#Flu Death Rates in Ca, NY, and NC. Plotted in a histogram in the visual section. 
+#Flu Death Rates in Ca, NY, and NC. Plotted in a boxplot in the visual section. 
 Flu <- subdata %>% filter(Cause == "Influenza and pneumonia") %>% filter(State == "California" | State == "New York" | State == "North Carolina") %>% select(Year, Cause, State, DeathRate)
 datatable(Flu, caption= "Flu Death Rates in Ca, NY, and NC")
 
@@ -195,9 +206,11 @@ Newyork's 1st cause of death was Heart disease during 2014 to 2016 and it is hig
 Plot2 <- ggplot(NNC2016, aes(x = Year, y = DeathRate)) 
 Plot2 + geom_bar(stat = "identity", aes(fill = Cause), position = "dodge") + facet_wrap( ~ State, labeller = label_both) + xlab("Year") + scale_fill_discrete(name = "") +
   ggtitle("Top Two Diseases from 2014 to 2016 in Ca, NY, and NC")
+```
 
-
-#Histogram of Flu Death Rates in Ca, NY, and NC
+The death rates from the influenza virus were similar in California, New York, and North Carolina. New York has a slightly higher death rate from influenza than North Carolina or California.  
+```{r, echo=FALSE, eval= TRUE}
+#Boxplot of Flu Death Rates in Ca, NY, and NC
 p <- ggplot(Flu, aes(x=State, y=DeathRate)) + 
   geom_boxplot()
 p <- p + geom_jitter(aes(color = DeathRate))
