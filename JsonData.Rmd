@@ -1,7 +1,7 @@
 ---
 title: "JSONData"
 author: "GroupB JSON Partners"
-date: "June 14, 2019"
+date: "June 15, 2019"
 output:   
   html_document:  
     toc: yes  
@@ -125,7 +125,7 @@ library(dplyr)
   
 #### Numeric Summaries
   
-We can see North Carolina #1 cause of Death was **Cancer** 19,523 people died(Rate is 162 per 100,000) in 2016.  
+We can see North Carolina #1 cause of Death was Cancer 19,523 people died(Rate is 162 per 100,000 population) in 2016.  
   
 ```{r, echo=FALSE, eval= TRUE}
 #Create a function to get subdataset.
@@ -150,7 +150,7 @@ NCYears <- subdata %>% select(Year, State, Cause, DeathRate) %>% filter(State ==
 
 #### Visual Summaries  
 
-We can see that the cancer occupies 22% of all cause of deaths, 20%, 6%, 6%, 5%, respectively in 2016.  
+From the cause proportion, We can easily see that Cancer account for 22% of all deaths and Heart disease account for 20% in 2016.   
   
 ```{r, echo=FALSE, eval= TRUE}
 #Graph of 2016 NC top 5 deaths 
