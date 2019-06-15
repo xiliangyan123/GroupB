@@ -33,7 +33,7 @@ XML is a good way to store data for several reasons.
 
 If you're interested in learning more, please visit [this website](https://searchmicroservices.techtarget.com/definition/XML-Extensible-Markup-Language)!
 
-##Description of Data
+## Description of Data
 We have chosen a census dataset from the National Center for Health Statistics, that presents the age-adjusted death rates for the 10 leading causes of death in the US beginning in 1999. Age-adjusted death rates are (per 100,000 population) based on the 2000 US standard population. 
 
 This data enables us to identify health problems in different states, and mainly document the health status of the popluation and of important subgroups. Below, you can find some relevant analyses of our data. 
@@ -43,6 +43,8 @@ We used XML package in R. XML package has bunch of useful functions for data rea
 1. xmlParse() comes from the XML package in R. It is used commonly to parse or analyze each component of an XML file. This helps to generate an R structure representing the XML tree. 
 2. The xmlToDataframe() enables us to extract data from a simple xml document.  
 3. The nodes option entails a list of XML nodes (components), which are to be processed. The getNodeSet() enables us to access a specific part of our xml file. 
+
+To learn more about XML package, click [here](https://cran.r-project.org/web/packages/XML/XML.pdf).
 
 # Read/Manipulate Data
 To begin reading in XML data, follow these steps:
