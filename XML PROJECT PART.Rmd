@@ -39,10 +39,10 @@ We have chosen a census dataset from the National Center for Health Statistics, 
 This data enables us to identify health problems in different states, and mainly document the health status of the popluation and of important subgroups. Below, you can find some relevant analyses of our data. 
 
 ## Package/functions used to read in xml data
-We used XML package in R. XML package has bunch of useful functions for data read in and manipulation. 
-1. xmlParse() comes from the XML package in R. It is used commonly to parse or analyze each component of an XML file. This helps to generate an R structure representing the XML tree. 
+We used XML package in R. XML package has bunch of useful functions for data read in and manipulation.  
+1. xmlParse() comes from the XML package in R. It is used commonly to parse or analyze each component of an XML file. This helps to generate an R structure representing the XML tree.  
 2. The xmlToDataframe() enables us to extract data from a simple xml document.  
-3. The nodes option entails a list of XML nodes (components), which are to be processed. The getNodeSet() enables us to access a specific part of our xml file. 
+3. The nodes option entails a list of XML nodes (components), which are to be processed. The getNodeSet() enables us to access a specific part of our xml file.   
 
 To learn more about XML package, click [here](https://cran.r-project.org/web/packages/XML/XML.pdf).
 
@@ -246,7 +246,7 @@ knitr::kable(GeorgiaData, caption= "Causes of Death in Georgia in Last 5 years (
 ```
 
 ## Visual Summary - Quantitative
-Bar graph helps us in identifying the leading causes of death in Georgia over period of 2011-2016. The top 3 causes of death were CLRD, Unintentional Injuries followed by stroke. 
+Bar graph helps us in identifying the leading causes of death in Georgia over period of 2011-2016. The top 3 causes of death were Cancer, Heart Disease followed by CLRD. 
 
 The boxplot provides a 5-point summary of the data. By plotting the age adjusted death rate, our trend shows that Maine's rates for heart disease and stroke are consistently higher relative to other New England area. We also see that there was a significant drop in average AADR in 2016 as compared to previous years. 
 
