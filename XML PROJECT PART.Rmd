@@ -202,7 +202,7 @@ b + geom_boxplot() + geom_jitter(aes(col=State)) + xlab("Year") + ylab("Age Adju
 
 #Alternative way to read in data
 We can also read in data straight from the internet!
-```{r}
+```{r, echo=TRUE}
 library(XML)
 library(DT)
 library(dplyr)
@@ -219,7 +219,7 @@ deaths <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//deaths")), "Deaths
 state <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//state")), "State")
 aadr <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//aadr")), "AADR")
 xmlDataDfA <- cbind(year, cause, deaths, state, aadr)  
-str(xmlDataDfA)
+
 options(digits = 10)
 #Convert AADR, Deaths & Year to numeric variables
 xmlDataDfA$AADR <- as.numeric(as.character(xmlDataDfA$AADR))
@@ -227,13 +227,16 @@ xmlDataDfA$Deaths <- as.numeric(as.character(xmlDataDfA$Deaths))
 str(xmlDataDfA)
 ```
 
+#Plots Galore!
+
 ## Data Analysis 
+The table provides us a summary of leading causes of deaths in  Georgia between 2011 and 2016. It shows the total number of deaths and average age adjusted death rate for each cause. We can see that from this table, the average death ratio and average of total deaths are highly correlated. 
 ```{r}
 library(knitr)
 library(ggplot2)
 #Create Functions to get info from US and NC
 last5yearSummary <- function(x, na.rm=TRUE, ...) {
-  totalDeathsByState <- xmlDataDfA %>% group_by(Cause) %>% filter(Year %in% (2011:2016) & State == x & Cause!= "All causes") %>% mutate(totalDeaths = sum(Deaths), avgAADR = mean(AADR)) %>% select(State, Cause, totalDeaths, avgAADR)
+  totalDeathsByState <- xmlDataDfA %>% group_by(Cause) %>% filter(Year %in% (2011:2016) & State == x & Cause!= "All causes") %>% mutate(totalDeaths = sum(Deaths), avgAADR = mean(AADR)) %>% select(State, Cause, totalDeaths, avgAADR) 
   return(Last5Year <- distinct(totalDeathsByState))
 }
 GeorgiaData <- last5yearSummary("Georgia")
@@ -241,8 +244,12 @@ GeorgiaData <- last5yearSummary("Georgia")
 knitr::kable(GeorgiaData, caption= "Causes of Death in Georgia in Last 5 years (2011-2016)")
 ```
 
-## Visual Summary - Quantitave
-```{r plots}
+## Visual Summary - Quantitative
+Bar graph helps us in identifying the leading causes of death in Georgia over period of 2011-2016. The top 3 causes of death were CLRD, Unintentional Injuries followed by stroke. 
+
+The boxplot provides a 5-point summary of the data. By plotting the age adjusted death rate, our trend shows that Maine's rates for heart disease and stroke are consistently higher relative to other New England area. We also see that there was a significant drop in average AADR in 2016 as compared to previous years. 
+
+```{r plot}
 library(ggplot2)
 library(dplyr)
 options(digits = 10)
