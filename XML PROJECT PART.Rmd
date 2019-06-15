@@ -13,7 +13,7 @@ output:
 knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning=FALSE)
 ```
 
-#Intro to XML
+# Intro to XML
 Lets start to understand about *Extensible Markup Language*, or XML. 
 
 To put in simple terms, XML is used to **describe data**. 
@@ -24,7 +24,7 @@ The basic foundation of XML code is an *element*, defined by *tags*. If you are 
 
 <*beginning tag*> **Element** <*/ending tag*>. 
 
-##Benefits
+## Benefits
 XML is a good way to store data for several reasons. 
 
 1. XML is a very simple medium to store the data. 
@@ -38,7 +38,13 @@ We have chosen a census dataset from the National Center for Health Statistics, 
 
 This data enables us to identify health problems in different states, and mainly document the health status of the popluation and of important subgroups. Below, you can find some relevant analyses of our data. 
 
-#Read/Manipulate Data
+## Package/functions used to read in xml data
+We used XML package in R. XML package has bunch of useful functions for data read in and manipulation. 
+1. xmlParse() comes from the XML package in R. It is used commonly to parse or analyze each component of an XML file. This helps to generate an R structure representing the XML tree. 
+2. The xmlToDataframe() enables us to extract data from a simple xml document.  
+3. The nodes option entails a list of XML nodes (components), which are to be processed. The getNodeSet() enables us to access a specific part of our xml file. 
+
+# Read/Manipulate Data
 To begin reading in XML data, follow these steps:
 
 1. Load in the XML package
@@ -54,15 +60,7 @@ library(dplyr)
 library(methods)
 library(tidyverse)
 
-#The xmlParse() comes from the XML package in R. 
-#This is used commonly to parse or analyze each component of an XML file. 
-#This helps to generate an R structure representing the XML tree. 
-
 xmlData <- xmlParse("xmldata.xml")
-
-# The xmlToDataframe() enables us to extract data from a simple xml document.  
-# The nodes option entails a list of XML nodes (components), which are to be processed
-# The getNodeSet() enables us to access a specific part of our xml file. 
 
 Y <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//year")), "Year")
 D <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//cause_name")), "Cause")
@@ -86,9 +84,9 @@ xmlDataDf2 <- xmlDataDf
 str(xmlDataDf2)
 ```
 
-#Summary Analyses
+# Summary Analyses
 
-##2010 Top 10 leading causes of Death in NC
+## 2010 Top 10 leading causes of Death in NC
 This datatable presents the top 10 causes of Death in NC proportional to the total number of deaths in the United States. This is an important topic to discuss, because although the number of deaths itself is important, a proportion can give us more information about the deaths in the state of NC. 
 
 A larger proportion can tell us which causes are more affecting residents in NC, which can help us make decisions that benefit the majority of residents in NC suffering from these potential causes. Kidney disease has the highest proportion out of the top 10 causes of death in NC, so focusing on this can be a good step in the future in terms of health care. 
@@ -124,7 +122,7 @@ g <- ggplot(NCtop3, aes(x=Causes, y=NCtoUSRatio))
 g + geom_bar(stat = "identity", fill="green") + labs(title = "NC Top 3 Causes of Death by Proportion")
 ```
 
-##Contingency Table 
+## Contingency Table 
 The Idea of this table is centered around how frequent the State of California will have more than 10k deaths within the 3 year period. The number 10k represents our threshold, which indicates if this is a cause that needs to be focused primarily on. 
 
 Heart disease, Cancer, and Chronic Lower Respiratory Disease (CLRD), each have 2 or more instances of having over 10k deaths. From this data, we can see that these might be the top 3 causes of death that would need major focus on. By devoting more time and money to these fields, we can help a majority of the population prevent and cure these causes. 
@@ -146,7 +144,7 @@ kable(xmlCT2[1, 1:10, 1:2], align='r', caption = "Occurrences of causes in Calif
 
 ```
 
-##Summary Statistics Table
+## Summary Statistics Table
 In these analyses, we are focused on analyzing the 3 largest states and the top leading cause of death in those states, which is heart disease. These tables provide us with the measures of the mean, which in this case refers to the average number of deaths in 2008, 2010, and 2012, and more. We can also analyze the minimum and maximum of those values the deaths as well, and see that the rates of change for Texas and Florida are low, compared to California. 
 
 ```{r Nsummaries}
@@ -177,7 +175,7 @@ kable(xmlFLcombn, caption="Summary of Heart Disease Deaths in FL through 3 Years
 
 ```
 
-##Graphical Representation of Data Analyses
+## Graphical Representation of Data Analyses
 In this plot, our goal is to find patterns and trends in death and suicide over a 3 year period. We decided to choose these causes, since they are likely the two biggest causes that are less known or less treatable in this list. Focusing on something like this, we hope to obtain valuable data. 
 
 By plotting the age adjusted death rate, our trend shows that California's rates for alzheimer's disease and suicide are not showing any signs of improvement or decline. We see, however for Florida and Texas, that in this 3 year period, health services treating Alzheimer's disease and suicide are improving greatly, with a decline in death rate each year. 
@@ -200,7 +198,7 @@ b + geom_boxplot() + geom_jitter(aes(col=State)) + xlab("Year") + ylab("Age Adju
 ```
 
 
-#Alternative way to read in data
+# Alternative way to read in data
 We can also read in data straight from the internet!
 ```{r, echo=TRUE}
 library(XML)
@@ -227,7 +225,7 @@ xmlDataDfA$Deaths <- as.numeric(as.character(xmlDataDfA$Deaths))
 str(xmlDataDfA)
 ```
 
-#Plots Galore!
+# Plots Galore!
 
 ## Quantitative Data Analysis 
 The table provides us a summary of leading causes of deaths in  Georgia between 2011 and 2016. It shows the total number of deaths and average age adjusted death rate for each cause. We can see that from this table, the average death ratio and average of total deaths are highly correlated.
