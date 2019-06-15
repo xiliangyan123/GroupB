@@ -198,3 +198,60 @@ b <- ggplot(xmlData3, aes(x=as.factor(Year), y=AADR))
 b + geom_boxplot() + geom_jitter(aes(col=State)) + xlab("Year") + ylab("Age Adjusted Death Rate") + ggtitle("Box Plot of AADR in 3 Largest States in 3 year period")
 
 ```
+
+
+#Alternative way to read in data
+We can also read in data straight from the internet!
+```{r}
+library(XML)
+library(DT)
+library(dplyr)
+library(methods)
+library(tidyverse)
+#The xmlParse() comes from the XML package in R. 
+#This is used commonly to parse or analyze each component of an XML file. 
+#This helps to generate an R structure representing the XML tree. 
+xmlData <- xmlParse("http://data.cdc.gov/api/views/bi63-dtpu/rows.xml")
+#extract xml data to dtatframe 
+year <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//year")), "Year")
+cause <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//cause_name")), "Cause")
+deaths <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//deaths")), "Deaths")
+state <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//state")), "State")
+aadr <- setNames(xmlToDataFrame(node=getNodeSet(xmlData, "//aadr")), "AADR")
+xmlDataDfA <- cbind(year, cause, deaths, state, aadr)  
+str(xmlDataDfA)
+options(digits = 10)
+#Convert AADR, Deaths & Year to numeric variables
+xmlDataDfA$AADR <- as.numeric(as.character(xmlDataDfA$AADR))
+xmlDataDfA$Deaths <- as.numeric(as.character(xmlDataDfA$Deaths))
+str(xmlDataDfA)
+```
+
+## Data Analysis 
+```{r}
+library(knitr)
+library(ggplot2)
+#Create Functions to get info from US and NC
+last5yearSummary <- function(x, na.rm=TRUE, ...) {
+  totalDeathsByState <- xmlDataDfA %>% group_by(Cause) %>% filter(Year %in% (2011:2016) & State == x & Cause!= "All causes") %>% mutate(totalDeaths = sum(Deaths), avgAADR = mean(AADR)) %>% select(State, Cause, totalDeaths, avgAADR)
+  return(Last5Year <- distinct(totalDeathsByState))
+}
+GeorgiaData <- last5yearSummary("Georgia")
+#Numeric Summary
+knitr::kable(GeorgiaData, caption= "Causes of Death in Georgia in Last 5 years (2011-2016)")
+```
+
+## Visual Summary - Quantitave
+```{r plots}
+library(ggplot2)
+library(dplyr)
+options(digits = 10)
+#Visual Summary
+g <- ggplot(GeorgiaData, aes(x=Cause, y=totalDeaths))
+g + geom_bar(stat = "identity", aes(fill= Cause)) + labs(title = "Causes of Deaths in Georgia over last 5 years") + scale_color_discrete(name="Cause of Death") + theme(axis.title.x=element_blank(),
+        axis.text.x=element_blank(),
+        axis.ticks.x=element_blank())
+SubData <- xmlDataDf %>% filter((Year %in% (2011:2016)) & (State %in% c( "Maine", "Vermont", "New Hampshire", "Massachusetts", "Rhode Island", "Connecticut")) & (Cause %in% c("Stroke" , "Heat disease")))
+g1 <- ggplot(SubData, aes(x=as.factor(Year), y=AADR))
+g1 + geom_boxplot() + geom_jitter(aes(col=State)) + xlab("Year") + ylab("Age Adjusted Death Rate") + ggtitle("Box Plot of AADR in last 5 years(2011-2016) in New England Area")
+```
